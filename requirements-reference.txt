@@ -1,0 +1,2 @@
+# Optional numerical cross-check only. Core package has no runtime dependencies.
+scipy>=1.11,<2
