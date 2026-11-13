@@ -1,5 +1,9 @@
 # Method and exactness
 
+The global calculation minimizes weighted pairwise disagreement over complete
+orders. The local trace considers adjacent swaps only. The independent checker
+replays both from the supplied ballots; it does not call the optimizer.
+
 ## Objective
 
 For candidates `a != b`, let `M[a,b]` be the total supplied weight of ballots ranking `a` before `b`. The diagonal is zero and `M[a,b] + M[b,a]` equals total weight.
@@ -39,13 +43,13 @@ Python retains every minimizing first choice and prepends it to every optimal ta
 
 JavaScript computes optimum values by the equivalent append-last recurrence: placing `i` last adds `sum M[i,j]` over remaining members. It then constructs the same canonical prepend-first evidence. Full-order costs are computed directly from ballots rather than the Python pair-matrix scoring path.
 
-## Local search is explicitly weaker
+## Adjacent-swap local search
 
 For adjacent `a,b` in an order, swapping them changes no other pair orientation. The exact neighbor-cost delta is `M[a,b] - M[b,a]`. A local order has every delta nonnegative. A strict local order has every delta positive. Singleton orders satisfy both predicates vacuously.
 
 The trace takes the most negative delta, chooses the leftmost position among equal improvements, and stops if no delta is negative. Cost strictly decreases, so revisiting an order is impossible and the finite trace terminates. Zero-cost plateau moves are not taken. `start` affects this trace alone. No claim is made that this policy matches every local-Kemenization algorithm in the literature or finds a global optimum.
 
-For the default profile: `M[0,1]=5`, `M[1,2]=5`, `M[2,0]=4`, total weight 7. Independent pair costs are 2, 2 and 3, giving `L=7`. Exact `0>1>2` costs 8. Start `1>2>0` costs 10 and both adjacent swaps worsen it, by 3 and 1. Local/global gap is 2; `cycle_tax` is 1. These are arithmetic on the supplied developed profile, not experimental generalization.
+For the default profile: `M[0,1]=5`, `M[1,2]=5`, `M[2,0]=4`, total weight 7. Independent pair costs are 2, 2 and 3, giving `L=7`. Exact `0>1>2` costs 8. Start `1>2>0` costs 10 and both adjacent swaps worsen it, by 3 and 1. Local/global gap is 2; `cycle_tax` is 1. These values describe this constructed profile, not performance on unseen rankings.
 
 ## Replay trust boundary
 
