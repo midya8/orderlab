@@ -1,10 +1,18 @@
 # OrderLab
 
-**No improving adjacent swap. Still not the best order.**
+OrderLab combines complete rankings into a total order with the least weighted
+pairwise disagreement. Supply strict rankings and integer multiplicities, then
+compare exact Kemeny optima with an adjacent-swap local search. A local search
+can stop even when a better order exists.
 
-A bounded, exact rank-aggregation workbench for AI search ensembles and preference reasoning. Supply complete strict rankings with integer multiplicities. Inspect the pairwise majority graph, every optimal Kemeny order, every subset recurrence, every complete-order cost and a deterministic local-descent trace. Export the full report and replay it with an independent checker.
+The browser shows the pairwise majority graph, subset recurrence, every complete
+order's cost and the descent trace. Export a report and replay it with the
+independent Python checker. The implementation stops at six candidates so all
+optimal orders can be retained and checked.
 
-This is an original implementation and teaching interface for classical rank aggregation, not a new aggregation method, learned ranker, benchmark result, fairness model or election recommendation. All examples are original developed controls, not held-out evaluation. No paid API, server or runtime dependency.
+This implements classical rank aggregation, not a new method or a learned
+ranker. The examples are constructed controls, not held-out evaluation. The
+package and browser need no paid API, server or runtime dependency.
 
 ## The counterexample
 
@@ -14,7 +22,7 @@ This is an original implementation and teaching interface for classical rank agg
 | 1 > 2 > 0 | 2 |
 | 2 > 0 > 1 | 2 |
 
-Starting at `1 > 2 > 0`, cost is **10**. Its adjacent swaps increase cost by **3** and **1**, so it is a strict adjacent-local minimum. The unique global optimum `0 > 1 > 2` costs **8**. The pairwise-independent lower bound is **7**. Three distinct numbers: local/global gap **2**, global optimum **8**, excess over the independent pair bound **1**.
+Starting at `1 > 2 > 0`, cost is **10**. Its adjacent swaps increase cost by **3** and **1**, so it is a strict adjacent-local minimum. The unique global optimum `0 > 1 > 2` costs **8**. The pairwise-independent lower bound is **7**. The local/global gap is **2**; the optimum exceeds the independent pair bound by **1**.
 
 The cycle `0 > 1 > 2 > 0` has majority margins `3, 3, 1`. Breaking its cheapest edge costs one extra unit, not an entire ballot and not a count of cycles. See [METHOD.md](METHOD.md) for definitions, proof and limits.
 
@@ -44,7 +52,7 @@ One to six candidates, IDs `0..n-1`. Every ballot and `start` is a complete stri
 
 Ties between aggregate costs are different from ties inside input ballots: all optimal total orders are retained and sorted by ID for reproducible evidence, not selected as a hidden preference rule. The all-tie six-candidate control retains all **720** orders. A one-candidate profile has no adjacent swaps; both local predicates hold vacuously.
 
-## Evidence paths
+## Implementation and checks
 
 - `orderlab/engine.py`: prepend-first exact subset DP, complete full-order census and strict descent.
 - `docs/order-engine.js`: independently structured append-last DP and direct ballot-inversion full-order scoring, with exact report parity.
@@ -52,7 +60,7 @@ Ties between aggregate costs are different from ties inside input ballots: all o
 - `tools/check_milp.py`: optional independent binary linear-ordering formulation solved by SciPy/HiGHS. Built directly from ballots, with all triangle constraints. Checks one optimum cost per non-singleton profile and independently decodes and scores the returned order. This floating-point reference is not the exact certificate and does not prove the full tied family.
 - `tools/browser_expected.py`: direct ballot oracle for every selected-order ledger and subset transition shown in Chrome. Browser exports are passed to the native checker.
 
-Exactness comes from bounded integer arithmetic and exhaustive completeness checks, not a model's confidence. Python uses integers. Browser totals are bounded by `10000 * choose(6,2) = 150000`; counts are at most `6! = 720`, safely inside exact JavaScript integer range.
+The exact checks use bounded integer arithmetic and exhaustive enumeration. Python uses integers. Browser totals are bounded by `10000 * choose(6,2) = 150000`; counts are at most `6! = 720`, safely inside exact JavaScript integer range.
 
 ## Reproduce the checks
 
@@ -72,4 +80,4 @@ The browser test uses actual Chrome and trusted mouse events for downloads. Set 
 
 Kemeny aggregation is generally computationally hard; this work intentionally stops at six candidates. The complete report and independent checker enumerate factorial-size families. The subset DP alone has `2^n` states and `n * 2^(n-1)` transitions; those bounds are not claims about the end-to-end census/checker runtime. Local descent crosses only strictly improving adjacent swaps, never tied plateaus; its endpoint is not a global certificate.
 
-No new theorem, copied implementation, learned relevance, real election data, real-world truth, fairness guarantee or scalability claim. The objective does not infer what the ballots ought to mean. [SOURCES.md](SOURCES.md) credits the classical definition, local/global distinction and exact subset recurrence; the project code, controls, interface and evidence format are original. MIT license.
+The objective measures disagreement with the supplied ballots. It does not infer relevance, truth, fairness or what those ballots ought to mean; this is not a real-election study or a scalability result. [SOURCES.md](SOURCES.md) credits the classical definition, local/global distinction and exact subset recurrence; the project code, controls, interface and evidence format are original. MIT license.
